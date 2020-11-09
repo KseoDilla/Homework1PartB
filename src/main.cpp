@@ -3,9 +3,10 @@
 */
 #include <iostream> //std::cout,cin
 #include <stdio.h> //printf
-#include <unistd.h>
-#include <csignal>
-#include "Matrix.h"
+#include <memory> //unique_ptr
+#include <unistd.h> //getopt
+#include <csignal> //signal handler
+#include "MatrixMenu.h" //matrix menu
 
 using namespace std;
 
@@ -34,8 +35,6 @@ static void ShowInfo(std::string name)
         << "Options:\n"
         << "\t-h,--help\t\tShow this help message\n"
         << "\tOPTIONAL -f,--file\t\tFile for data input\n"
-        << "\tOPTIONAL -n,--width\t\tWidth of the matrix\n"
-        << "\tOPTIONAL -m,--height\t\tHeight of the matrix\n"
         << std::endl;
 }
 
@@ -46,21 +45,15 @@ static void ShowInfo(std::string name)
 // Output:
 //       - False on undefined argument or missing parameter
 //       - True on successful parameter
-static bool ParseArgs(int argc, char* argv[], std::string& fileName, std::string& width, std::string& height)
+static bool ParseArgs(int argc, char* argv[], std::string& fileName)
 {
     int opt;
-    while((opt = getopt(argc, argv, "f:n:m")) != -1)
+    while((opt = getopt(argc, argv, "f:")) != -1)
     {
         switch(opt)
         {
             case 'f':
                 fileName = optarg;
-                break;
-            case 'n':
-                width = optarg;
-                break;
-            case 'm':
-                height = optarg;
                 break;
             default:
                 ShowInfo(argv[0]);
@@ -70,29 +63,21 @@ static bool ParseArgs(int argc, char* argv[], std::string& fileName, std::string
     return true;
 }
 
+
+//Main entry point
+//Override the signal handler - sole purpose so Makefile exits cleanly when sigint is raised
 int main(int argc, char* argv[])
 {
     std::signal(SIGINT, sighandler);
 
     std::string fileName = "";
-    std::string width = "1"; //default width
-    std::string height = "1"; //default height
-    if(ParseArgs(argc, argv, fileName, width, height))
+    if(ParseArgs(argc, argv, fileName))
     {
         try
         {
-            while(1)
-            {
-                try
-                {
-                    //Let's construct the object
-                    Matrix(stoul(width), stoul(height));
-                }
-                catch(std::exception &e)
-                {
-                    std::cout << &e << std::endl;
-                }
-            }
+            std::unique_ptr<MatrixMenu> menu;
+            menu = fileName.empty() ? make_unique<MatrixMenu>() : make_unique<MatrixMenu>(fileName);
+            menu->Start();
         }
         catch(...)
         {

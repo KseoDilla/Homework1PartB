@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 
-class Matrix
+template <typename T> class Matrix
 {
     public:
         //default constructor
@@ -19,27 +19,44 @@ class Matrix
         //Default destructor
         ~Matrix();
 
+        //Print method for printing the whole matrix
+        void Print(std::ostream & outFile=std::cout) const;
+
+        std::vector<T> GetRow() const;
+
         //Getters for width, height, and specific indices in the matrix
         unsigned int GetWidth() const;
         unsigned int GetHeight() const;
-        long double operator()(const unsigned int i, const unsigned int j) const;
+        const T operator()(const unsigned int i, const unsigned int j) const;
+        std::vector<T> operator()(const unsigned int row) const;
 
         //Setter for specific index in matrix
-        void operator()(const unsigned int i, const unsigned int j, long double value);
+        void operator()(const unsigned int i, const unsigned int j, const T& value);
 
-        Matrix operator=(const Matrix& rhs);
-        Matrix operator+(const Matrix& rhs) const;
-        Matrix operator+=(const Matrix& rhs);
-        Matrix operator-(const Matrix& rhs) const;
-        Matrix operator-=(const Matrix& rhs);
-        Matrix operator*(const long double scalar) const;
+        Matrix<T> operator=(const Matrix<T>& rhs);
+
+        Matrix<T> operator+(const Matrix<T>& rhs) const;
+        Matrix<T> operator+=(const Matrix<T>& rhs);
+
+        Matrix<T> operator-(const Matrix<T>& rhs) const;
+        Matrix<T> operator-=(const Matrix<T>& rhs);
+
+        Matrix<T> operator*(const T& scalar) const;
+        Matrix<T> operator*=(const T& scalar);
+
+        Matrix<T> operator*(const Matrix<T>& rhs) const;
+        Matrix<T> operator*=(const Matrix<T>& rhs);
+
+        void Transpose();
+        void Reverse();
+        void Rotate();
 
     private:
-        std::string m_fileName;
         unsigned int m_width;
         unsigned int m_height;
-        std::vector<std::vector<long double>> m_matrix;
+        std::vector<std::vector<T>> m_matrix;
 };
 
 
+#include "Matrix.cpp"
 #endif

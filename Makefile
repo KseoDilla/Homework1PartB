@@ -8,12 +8,12 @@ CXX = g++
 # compiler flags:
 #  -g    adds debugging information to the executable file
 #  -Wall turns on most, but not all, compiler warnings
-CXXFLAGS  = -g -Wall -O2 -std=gnu++11
+CXXFLAGS  = -g -Wall -O2 -std=gnu++14
 
 # 
 TARGET = hw1.out
 
-DEPS = src/Matrix.cpp
+DEPS = src/Matrix.cpp src/MatrixMenu.cpp
 
 all: $(TARGET) test_runner
 	@echo  "Executing test_runner..."
@@ -27,10 +27,12 @@ all: $(TARGET) test_runner
 $(TARGET): $(DEPS)
 	@echo "Compiling source..."
 	@$(CXX) $(CXXFLAGS) -o $(TARGET) $(DEPS) src/main.cpp -lgtest -lgtest_main -lpthread
+	@echo "..Source compiled successfully"
 
-test_runner: unitTest/test_main.cpp
-	@echo "Compiling unitTest..."
+test_runner: unitTest/Matrix_test.cpp
+	@echo "Compiling unit test..."
 	@$(CXX) $(CXXFLAGS) -o test_runner unitTest/Matrix_test.cpp unitTest/test_main.cpp -lgtest -lgtest_main -lpthread
+	@echo "...Unit test compiled successfully"
 
 clean:
 	$(RM) $(TARGET) test_runner 

@@ -5,8 +5,8 @@
 class MatrixTest : public ::testing::Test
 {
     protected:
-        Matrix* pMatrix1;
-        Matrix* pMatrix2;
+        Matrix<float>* pMatrix1;
+        Matrix<float>* pMatrix2;
 
     MatrixTest() {
     }
@@ -16,8 +16,8 @@ class MatrixTest : public ::testing::Test
 
     virtual void SetUp()
     {
-        pMatrix1 = new Matrix(3,3);
-        pMatrix2 = new Matrix(3,3);
+        pMatrix1 = new Matrix<float>(3,3);
+        pMatrix2 = new Matrix<float>(3,3);
         for(unsigned int i = 0; i < 3 ; ++i)
         {
             for(unsigned int j = 0; j < 3; ++j)
@@ -39,7 +39,7 @@ class MatrixTest : public ::testing::Test
 //Test the default constructor
 TEST(MatrixStandAlone_Test, MatrixDefaultConstructor)
 {
-    Matrix matrix;
+    Matrix<float> matrix;
     unsigned int N = matrix.GetWidth();
     unsigned int M = matrix.GetHeight();
     EXPECT_EQ(1, N);
@@ -80,7 +80,7 @@ TEST_F(MatrixTest, MatrixSetterGetter)
         for(unsigned int j = 0; j < M ; ++j)
         {
             //retrieve the index
-            EXPECT_DOUBLE_EQ(0.141519, pMatrix1->operator()(i,j));
+            EXPECT_FLOAT_EQ(0.141519, pMatrix1->operator()(i,j));
         }
     }
     EXPECT_THROW(pMatrix1->operator()(900, 900), std::invalid_argument);
@@ -91,7 +91,7 @@ TEST_F(MatrixTest, MatrixSetterGetter)
 
 TEST_F(MatrixTest, MatrixAddition)
 {
-    Matrix bad_dimension(1,3);
+    Matrix<float> bad_dimension(1,3);
 
     EXPECT_THROW(bad_dimension + *pMatrix1, std::invalid_argument);
 
@@ -105,12 +105,12 @@ TEST_F(MatrixTest, MatrixAddition)
     }
 
     //Test the addition operator
-    Matrix result = *pMatrix1 + *pMatrix2;
+    Matrix<float> result = *pMatrix1 + *pMatrix2;
     for(unsigned int i = 0; i < N; ++i)
     {
         for(unsigned int j = 0; j < M; ++j)
         {
-            EXPECT_DOUBLE_EQ(2.1415189999999997, result(i,j));
+            EXPECT_FLOAT_EQ(2.1415189999999997, result(i,j));
         }
     }
 
@@ -120,7 +120,7 @@ TEST_F(MatrixTest, MatrixAddition)
     {
         for(unsigned int j = 0; j < M; ++j)
         {
-            EXPECT_DOUBLE_EQ(3.2830379999999999, result(i,j));
+            EXPECT_FLOAT_EQ(3.2830379999999999, result(i,j));
         }
     }
 }
@@ -137,12 +137,12 @@ TEST_F(MatrixTest, MatrixSubtraction)
             pMatrix2->operator()(i, j, 0.0000000000001);
     }
 
-    Matrix result = *pMatrix1 - *pMatrix2;
+    Matrix<float> result = *pMatrix1 - *pMatrix2;
     for(unsigned int i = 0; i < N; ++i)
     {
         for(unsigned int j = 0; j < M; ++j)
         {
-            EXPECT_DOUBLE_EQ(0.99999999999989997, result(i,j));
+            EXPECT_FLOAT_EQ(0.99999999999989997, result(i,j));
         }
     }
 }
@@ -153,13 +153,40 @@ TEST_F(MatrixTest, MatrixMultiplication)
 {
     unsigned int N = pMatrix1->GetWidth();
     unsigned int M = pMatrix1->GetHeight();
-    Matrix result = *pMatrix1 * 5.555555;
+    Matrix<float> result = *pMatrix1 * 5.555555;
 
     for(unsigned int i = 0; i < N; ++i)
     {
         for(unsigned int j = 0; j < M; ++j)
         {
-            EXPECT_DOUBLE_EQ(5.555555, result(i,j));
+            EXPECT_FLOAT_EQ(5.555555, result(i,j));
+        }
+    }
+
+    result *= 2.0;
+    for(unsigned int i = 0; i < N; ++i)
+    {
+        for(unsigned int j = 0; j < M; ++j)
+        {
+            EXPECT_FLOAT_EQ(11.11111, result(i,j));
+        }
+    }
+
+    result = *pMatrix1 * *pMatrix2;
+    for(unsigned int i = 0; i < N; ++i)
+    {
+        for(unsigned int j = 0; j < M; ++j)
+        {
+            EXPECT_FLOAT_EQ(3.0, result(i,j));
+        }
+    }
+
+    result *= *pMatrix1;
+    for(unsigned int i = 0; i < N; ++i)
+    {
+        for(unsigned int j = 0; j < M; ++j)
+        {
+            EXPECT_FLOAT_EQ(9.0, result(i,j));
         }
     }
 }
