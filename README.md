@@ -8,7 +8,8 @@
 - [x] Populate README.md
 
 ## Preqrequistes
-Install google test
+1. Built in mind for Linux
+2. Install google test and cmake
     - 1. `sudo apt-get install googletest cmake -y`
     - 2. `cd /usr/src/googletest`
     - 3. `sudo mkdir build`
@@ -18,7 +19,7 @@ Install google test
     - 7. `sudo cp googlemock/*.a googlemock/gtest/*.a /usr/lib`
 
 
-## How to build and differentw ways to run:
+## How to build the executable and execute:
 1. `make clean ; make -j8`
 > Running make's default will compile all targets (src and unit tests) and execute the binaries for you
 2. `make hw1.out`
