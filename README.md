@@ -57,3 +57,4 @@ Keystroke: `ctrl+c`
 3. Buff up unit test with more test cases - test negative paths
 4. Improve MatrixMenu to support different data types - right now it's hard coded to floats
 5. Improve MatrixMenu by removing a lot of redundant statements, espeically the ProcessFile
+6. a GUI would've solved a lot of the nuances of trying to print out the matrices, and also needing to provide a terminal based menu interface
