@@ -4,27 +4,28 @@
 - [x] Write Matrix Library
 - [x] Write unit tests for Matrix
 - [x] Write menu interface
-- [ ] Fix the menu interface - it should not prompt when rotating an image
-- [ ] Fix bugs for menu interface
-- [ ] Write a script to install google test or document steps
-- [ ] Populate README.md
+- [x] Write a script to install google test or document steps
+- [x] Populate README.md
 
 ## Preqrequistes
 Install google test
-1. sudo apt-get install googletest -y
-2. cd /usr/src/googletest
-3. sudo mkdir build
-4. cd build
-5. sudo cmake ..
-6. sudo make
-7. sudo cp googlemock/*.a googlemock/gtest/*.a /usr/lib
+    - 1. `sudo apt-get install googletest cmake -y`
+    - 2. `cd /usr/src/googletest`
+    - 3. `sudo mkdir build`
+    - 4. `cd build`
+    - 5. `sudo cmake ..`
+    - 6. `sudo make`
+    - 7. `sudo cp googlemock/*.a googlemock/gtest/*.a /usr/lib`
+
 
 ## How to build and differentw ways to run:
 1. `make clean ; make -j8`
-> Running make will execute the unit test and run the program
-2. `hw1.out`
-3. `hw1.out -f <data file>`
-> Provide a relative path from where the executable is
+> Running make's default will compile all targets (src and unit tests) and execute the binaries for you
+2. `make hw1.out`
+> Running the make target `hw1.out` will compile only the source (just in case we have difficulty compiling the unit tests)
+> Execute the binary as `hw1.out` or `hw1.out -f <relative_path_to_data_file>
+3. `make test_runner`
+> Running the make target `test_runner` will compile only the unit tests along with the matrix library from src
 
 ## How should the data file be structured - (Currently, not bullet proof)
 1. First line has a total of 4 arguments separated by spaces
@@ -43,5 +44,13 @@ Install google test
     - Rotate
 
 
-## How to quit:
+## How to quit out of the program:
 Keystroke: `ctrl+c`
+
+
+### How to improve this program:
+1. Support Matrix Scalar inside the Matrix Menu without constructing a 1x1 matrix
+2. Ensure data reaches the disk - file can be corrupted
+3. Buff up unit test with more test cases - test negative paths
+4. Improve MatrixMenu to support different data types - right now it's hard coded to floats
+5. Improve MatrixMenu by removing a lot of redundant statements, espeically the ProcessFile

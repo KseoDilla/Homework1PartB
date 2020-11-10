@@ -1,9 +1,12 @@
+//#############################
+//  Homework B by Kevin Suh   #
+//#############################
+
 #ifndef MATRIX_CPP
 #define MATRIX_CPP
 
 // Matrix Class
 #include "Matrix.h"
-#include <iomanip>
 #include <stdexcept>
 
 
@@ -85,6 +88,7 @@ Matrix<T>::GetHeight() const
 
 
 
+//Overloading the assignment operator
 template<typename T>
 Matrix<T>
 Matrix<T>::operator=(const Matrix<T>& rhs)
@@ -109,6 +113,7 @@ Matrix<T>::operator=(const Matrix<T>& rhs)
 
 
 
+//Overloading the function call operator - this is a getter
 template<typename T>
 const T
 Matrix<T>::operator()(unsigned int i, unsigned int j) const
@@ -122,6 +127,7 @@ Matrix<T>::operator()(unsigned int i, unsigned int j) const
 
 
 
+//Overloading the function call operator - this is a setter
 template<typename T>
 void
 Matrix<T>::operator()(const unsigned int i, const unsigned int j, const T& value)
@@ -139,13 +145,12 @@ Matrix<T>::operator()(const unsigned int i, const unsigned int j, const T& value
 
 
 //Overload the addition operator so we can subtract between two matrices
-//Does not support unequal matrices
 template<typename T>
 Matrix<T>
 Matrix<T>::operator+(const Matrix<T>& rhs) const
 {
     if(( m_width != rhs.m_width) || (m_height != rhs.m_height))
-        throw std::invalid_argument("Opeartion + not supported: Matrices are not the same size");
+        throw std::invalid_argument("Operation + not supported: Matrices are not the same dimension");
     Matrix result(m_width, m_height);
     for(unsigned int i = 0; i < m_width; ++i)
     {
@@ -164,7 +169,7 @@ Matrix<T>
 Matrix<T>::operator+=(const Matrix<T>& rhs)
 {
     if((m_width != rhs.m_width) || (m_height != rhs.m_height))
-        throw std::invalid_argument("Operation += not supported: Matrices are not the same size");
+        throw std::invalid_argument("Operation += not supported: Matrices are not the same dimension");
     for(unsigned int i = 0; i < m_width; ++i)
     {
         for(unsigned int j = 0; j < m_height; ++j)
@@ -206,7 +211,7 @@ Matrix<T>
 Matrix<T>::operator-=(const Matrix<T>& rhs)
 {
     if((m_width != rhs.m_width) || (m_height != rhs.m_height))
-        throw std::invalid_argument("Opeartion -= not supported: Matrices are not the same size");
+        throw std::invalid_argument("Operation -= not supported: Matrices are not the same size");
     for(unsigned int i = 0; i < m_width; ++i)
     {
         for(unsigned int j = 0; j < m_height; ++j)
@@ -219,46 +224,49 @@ Matrix<T>::operator-=(const Matrix<T>& rhs)
 
 
 
+//Overloading the multiplication scalar operator
 template<typename T>
 Matrix<T>
-Matrix<T>::operator*(const T& rhs) const
+Matrix<T>::operator*(const T& scalar) const
 {
     Matrix result = *this;
     for(unsigned int i = 0; i < m_width; ++i)
     {
         for(unsigned int j = 0; j < m_height; ++j)
-            result.m_matrix[i][j] = m_matrix[i][j] * rhs;
+            result.m_matrix[i][j] = m_matrix[i][j] * scalar;
     }
     return result;
 }
 
 
 
+//Overloading the multiplication scalar assignment operator 
 template<typename T>
 Matrix<T>
-Matrix<T>::operator*=(const T& rhs)
+Matrix<T>::operator*=(const T& scalar)
 {
     for(unsigned int i = 0; i < m_width; ++i)
     {
         for(unsigned int j = 0; j < m_height; ++j)
-            m_matrix[i][j] *= rhs;
+            m_matrix[i][j] *= scalar;
     }
     return *this;
 }
 
 
 
+//Overloading the multiplication matrix-matrix operator
 template<typename T>
 Matrix<T>
 Matrix<T>::operator*(const Matrix<T>& rhs) const
 {
+    //MxN * NxP -> MxP
     if((m_height != rhs.m_width))
     {
-        std::string errString="Opeartion * not supported: Matrix-Matrix multiplication only supported if first matrix's column matches the second matrix's row";
+        std::string errString="Operation * not supported: Matrix-Matrix multiplication only supported if first matrix's column matches the second matrix's row";
         throw std::invalid_argument(errString);
 
     }
-    //MxN * NxP -> MxP
     Matrix result(m_width, rhs.m_height);
     for(unsigned int i = 0; i < m_width; ++i)
     {
@@ -275,13 +283,14 @@ Matrix<T>::operator*(const Matrix<T>& rhs) const
 
 
 
+//Overloading the multiplication matrix-matrix assignment operator
 template<typename T>
 Matrix<T>
 Matrix<T>::operator*=(const Matrix<T>& rhs)
 {
     if((m_height != rhs.m_width))
     {
-        std::string errString="Opeartion *= not supported: Matrix-Matrix multiplication only supported if first matrix's column matches the second matrix's row";
+        std::string errString="Operation *= not supported: Matrix-Matrix multiplication only supported if first matrix's column matches the second matrix's row";
         throw std::invalid_argument(errString);
 
     }
@@ -290,6 +299,7 @@ Matrix<T>::operator*=(const Matrix<T>& rhs)
 }
 
 
+//Overloading the function caller operator - this returns the row in a matrix
 template<typename T>
 std::vector<T>
 Matrix<T>::operator()(const unsigned int i) const
@@ -299,31 +309,37 @@ Matrix<T>::operator()(const unsigned int i) const
 
 
 
+//Rotates the matrix - uses Tranpose and Reverse as helper methods
 template<typename T>
 void
 Matrix<T>::Rotate()
 {
     if(m_height != m_width)
     {
-        throw std::invalid_argument("Rotate is only supported by"); 
+        throw std::invalid_argument("Rotate is only supported for NxN matrices"); 
     }
     Transpose();
     Reverse();
 }
 
+
+
+//Tranposes the matrix
 template<typename T>
 void
 Matrix<T>::Transpose()
 {
     if(m_height != m_width)
     {
-        throw std::invalid_argument("Rotate is only supported by"); 
+        throw std::invalid_argument("Transpose is only supported for NxN matrices"); 
     }
-    for(unsigned int i = 0; i < m_matrix.size(); ++i)
+    //assume this is a NxN
+    unsigned int N = m_matrix.size();
+    for(unsigned int i = 0; i < N; ++i)
     {
-        for(unsigned int j = i;  j < m_matrix.size(); ++j)
+        for(unsigned int j = i;  j < N; ++j)
         {
-            int tmp = m_matrix[j][i];
+            unsigned int tmp = m_matrix[j][i];
             m_matrix[j][i] = m_matrix[i][j];
             m_matrix[i][j] = tmp;
         }
@@ -331,21 +347,25 @@ Matrix<T>::Transpose()
 }
 
 
+
+//Reverses the rows
 template<typename T>
 void
 Matrix<T>::Reverse()
 {
     if(m_height != m_width)
     {
-        throw std::invalid_argument("Rotate is only supported by"); 
+        throw std::invalid_argument("Reverse is only supported for NxN matrices"); 
     }
-    for(unsigned int i = 0; i < m_matrix.size(); ++i)
+    //assume this is a NxN
+    unsigned int N = m_matrix.size();
+    for(unsigned int i = 0; i < N; ++i)
     {
-        for(unsigned int j = i;  j < m_matrix.size()/2; ++j)
+        for(unsigned int j = 0;  j < N; ++j)
         {
-            int tmp = m_matrix[i][j];
-            m_matrix[j][i] = m_matrix[i][m_matrix.size() -j -1];
-            m_matrix[i][j] = tmp;
+            unsigned int tmp = m_matrix[i][j];
+            m_matrix[i][j] = m_matrix[i][m_matrix.size()-j-1];
+            m_matrix[i][m_matrix.size()-j-1] = tmp;
         }
     }
 }

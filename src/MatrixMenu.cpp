@@ -1,3 +1,7 @@
+//#############################
+//  Homework B by Kevin Suh   #
+//#############################
+
 #ifndef MATRIXMENU_CPP
 #define MATRIXMENU_CPP
 
@@ -112,7 +116,7 @@ MatrixMenu::ActionInput()
                 break;
             case 8:
             {
-                std::cout << "Please provide a filename: " << std::endl;
+                std::cout << "Please provide a filename: ";
                 getline(std::cin, m_fileInput);
                 ProcessFile();
                 break;
@@ -162,10 +166,10 @@ MatrixMenu::CreateMatrices()
 {
     //make sure they populate both
     std::cout << "Please provide a dimension for Matrix A:";
-    GrabInput(m_matrix1);
+    GrabDimensionInput(m_matrix1);
     m_matrix1.Print();
     std::cout << "Please provide a dimension for Matrix B:";
-    GrabInput(m_matrix2);
+    GrabDimensionInput(m_matrix2);
     m_matrix2.Print();
     std::cout << std::endl;
 }
@@ -173,7 +177,7 @@ MatrixMenu::CreateMatrices()
 
 
 void
-MatrixMenu::GrabInput(Matrix<float> &matrix)
+MatrixMenu::GrabDimensionInput(Matrix<float> &matrix)
 {
     const unsigned int max = 2;
     std::string input;
@@ -202,7 +206,7 @@ MatrixMenu::GrabInput(Matrix<float> &matrix)
 
 
 void
-MatrixMenu::PrintMatrices(Matrix<float> matrix1, Matrix<float> matrix2) const
+MatrixMenu::PrintMatrices(const Matrix<float>& matrix1, const Matrix<float>& matrix2) const
 {
     unsigned int rowA = 0, rowB = 0;
     unsigned int widthA = matrix1.GetWidth(), widthB = matrix2.GetWidth();
@@ -236,9 +240,9 @@ MatrixMenu::PrintMatrices(Matrix<float> matrix1, Matrix<float> matrix2) const
 void
 MatrixMenu::AddMatrices()
 {
-    Matrix<float> result = m_matrix1 + m_matrix2;
     PrintMatrices(m_matrix1, m_matrix2);
     std::cout << "Matrix A + Matrix B" << std::endl;
+    Matrix<float> result = m_matrix1 + m_matrix2;
     result.Print();
 
     std::vector<Matrix<float>> history{m_matrix1, m_matrix2, result};
@@ -250,6 +254,8 @@ MatrixMenu::AddMatrices()
 void
 MatrixMenu::MultiplyMatrices()
 {
+    PrintMatrices(m_matrix1, m_matrix2);
+    std::cout << "Matrix A * Matrix B" << std::endl;
     Matrix<float> result;
     //This isn't really standard math but I thought "why not? a 1x1 is really just a scalar"
     if(m_matrix2.GetWidth() == 1 && m_matrix2.GetHeight() == 1)
@@ -260,8 +266,6 @@ MatrixMenu::MultiplyMatrices()
     {
         result = m_matrix1 * m_matrix2;
     }
-    PrintMatrices(m_matrix1, m_matrix2);
-    std::cout << "Matrix A * Matrix B" << std::endl;
     result.Print();
 
     std::vector<Matrix<float>> history{m_matrix1, m_matrix2, result};
@@ -273,9 +277,9 @@ MatrixMenu::MultiplyMatrices()
 void
 MatrixMenu::SubtractMatrices()
 {
-    Matrix<float> result = m_matrix1 - m_matrix2;
     PrintMatrices(m_matrix1, m_matrix2);
     std::cout << "Matrix A - Matrix B" << std::endl;
+    Matrix<float> result = m_matrix1 - m_matrix2;
     result.Print();
 
     std::vector<Matrix<float>> history{m_matrix1, m_matrix2, result};
@@ -317,10 +321,14 @@ MatrixMenu::PrintHistory(const bool saveToFile) const
             }
             else
             {
-                outFile << "Serious Bug Contact Maintainer: KevinSuh2014@gmail.com" << std::endl;
+                outFile << "Serious Bug Contact Maintainer" << std::endl;
             }
             outFile << std::endl;
         }
+        if(saveToFile)
+            std::cout << std::endl << "History Complete: saved to output.data"  << std::endl << std::endl;
+        else
+            std::cout << std::endl << "History Complete!" << std::endl << std::endl;
     }
     catch(std::exception &e)
     {
@@ -328,8 +336,9 @@ MatrixMenu::PrintHistory(const bool saveToFile) const
     }
     catch(...)
     {
-        std::cout << "FATAL Exception" << std::endl;
+        std::cout << "FATAL Exception: Contact Maintainer" << std::endl;
     }
+    of.close();
 }
 
 
@@ -446,10 +455,10 @@ MatrixMenu::ProcessFile()
                         lineCounter = 0;
                     }
                 }
-                std::cout << std::endl;
             }
         }
         file.close();
+        return;
     }
     catch(const std::exception &e)
     {
@@ -509,6 +518,7 @@ MatrixMenu::ProcessFileMatrices(std::ifstream& file, std::string input,
 {
     for(unsigned int matrixCounter = 0; matrixCounter < numOfMatrices;)
     {
+        //process empty lines
         if(input.empty())
         {
             getline(file,input);
@@ -575,8 +585,12 @@ MatrixMenu::ProcessFileOperations(std::ifstream& file, std::string input, const 
                 {
                     RotateMatrix();
                 }
+                else
+                {
+                    std::cout << "Unknown operation!" << std::endl;
+                }
                 operationCounter++;
-                std::cout << std::endl;
+                std::cout << std::endl << "Operation " << input << " complete." << std::endl;
             }
         }
         catch(std::exception &e)
@@ -584,11 +598,13 @@ MatrixMenu::ProcessFileOperations(std::ifstream& file, std::string input, const 
             operationCounter++;
             std::cout << "Standard Exception: " << e.what() << std::endl;
         }
+        std::cout << std::endl;
         getline(file,input);
     }
 }
 
 
+//Method to rotate a matrix
 void
 MatrixMenu::RotateMatrix()
 {
@@ -599,26 +615,34 @@ MatrixMenu::RotateMatrix()
     unsigned int input = 0;
     std::cin >> input;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cout << std::endl;
     if(input == 1)
     {
+        std::cout << "Matrix Before Rotation: " << std::endl;
+        m_matrix1.Print();
         Matrix<float> result = m_matrix1; 
         result.Rotate();
         std::vector<Matrix<float>> history{m_matrix1, result};
         m_matrix1 = result;
+        std::cout << "Matrix After Rotation: " << std::endl;
         m_matrix1.Print();
         m_history.push_back(std::make_pair("Rotate", history));
     }
     else if(input == 2)
     {
+        std::cout << "Matrix Before Rotation: " << std::endl;
+        m_matrix2.Print();
         Matrix<float> result = m_matrix2; 
         result.Rotate();
         std::vector<Matrix<float>> history{m_matrix2, result};
         m_matrix2 = result;
+        std::cout << "Matrix After Rotation: " << std::endl;
         m_matrix2.Print();
         m_history.push_back(std::make_pair("Rotate", history));
     }
     else
     {
+        //3 or invalid input - just exit
         return;
     }
 }

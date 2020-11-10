@@ -1,12 +1,13 @@
 #include "gtest/gtest.h"
 #include "../src/Matrix.cpp"
+#include <memory>
 
 
 class MatrixTest : public ::testing::Test
 {
     protected:
-        Matrix<float>* pMatrix1;
-        Matrix<float>* pMatrix2;
+        std::unique_ptr<Matrix<float>> pMatrix1;
+        std::unique_ptr<Matrix<float>> pMatrix2;
 
     MatrixTest() {
     }
@@ -16,8 +17,8 @@ class MatrixTest : public ::testing::Test
 
     virtual void SetUp()
     {
-        pMatrix1 = new Matrix<float>(3,3);
-        pMatrix2 = new Matrix<float>(3,3);
+        pMatrix1 = std::make_unique<Matrix<float>>(Matrix<float>(3,3));
+        pMatrix2 = std::make_unique<Matrix<float>>(Matrix<float>(3,3));
         for(unsigned int i = 0; i < 3 ; ++i)
         {
             for(unsigned int j = 0; j < 3; ++j)
@@ -31,10 +32,10 @@ class MatrixTest : public ::testing::Test
 
     virtual void TearDown()
     {
-        delete pMatrix1;
-        delete pMatrix2;
     }
 };
+
+
 
 //Test the default constructor
 TEST(MatrixStandAlone_Test, MatrixDefaultConstructor)
@@ -53,12 +54,14 @@ TEST(MatrixStandAlone_Test, MatrixDefaultConstructor)
 }
 
 
+
 //Test the paramterized constructor - they should be 3x3
 TEST_F(MatrixTest, MatrixConstructor)
 {
     EXPECT_EQ(3, pMatrix1->GetWidth());
     EXPECT_EQ(3, pMatrix1->GetHeight());
 }
+
 
 
 //Test the overloaded function call operator which
@@ -126,6 +129,7 @@ TEST_F(MatrixTest, MatrixAddition)
 }
 
 
+
 TEST_F(MatrixTest, MatrixSubtraction)
 {
     unsigned int N = pMatrix1->GetWidth();
@@ -146,6 +150,7 @@ TEST_F(MatrixTest, MatrixSubtraction)
         }
     }
 }
+
 
 
 //Test scalar, and matrix-matrix multiplcation
@@ -189,4 +194,36 @@ TEST_F(MatrixTest, MatrixMultiplication)
             EXPECT_FLOAT_EQ(9.0, result(i,j));
         }
     }
+}
+
+
+
+//Test rotation of matrix
+TEST_F(MatrixTest, MatrixRotation)
+{
+    unsigned int N = pMatrix1->GetWidth();
+    unsigned int M = pMatrix1->GetHeight();
+
+    for(unsigned int i = 0; i < N; ++i)
+    {
+        for(unsigned int j = 0; j < M; ++j)
+        {
+            pMatrix1->operator()(i,j,j);
+        }
+    }
+    pMatrix1->Rotate();
+    std::vector<std::vector<float>> matrixGoodCompare({{0.0, 0.0, 0.0},
+                                                   {1.0, 1.0, 1.0},
+                                                   {2.0, 2.0, 2.0}});
+    for(unsigned int i = 0; i < N; ++i)
+    {
+        for(unsigned int j = 0; j < M; ++j)
+        {
+            EXPECT_FLOAT_EQ(matrixGoodCompare[i][j], pMatrix1->operator()(i,j));
+        }
+    }
+
+
+    Matrix<float> NxM(2,3);
+    EXPECT_THROW(NxM.Rotate(), std::invalid_argument);
 }

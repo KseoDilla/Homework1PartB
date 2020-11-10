@@ -1,6 +1,7 @@
-/*
-//Homework B by Kevin Suh
-*/
+//#############################
+//  Homework B by Kevin Suh   #
+//#############################
+
 #include <iostream> //std::cout,cin
 #include <stdio.h> //printf
 #include <memory> //unique_ptr
